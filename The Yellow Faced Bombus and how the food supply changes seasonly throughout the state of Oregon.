@@ -1,0 +1,36 @@
+title: "The Yellow Faced Bombus and how the food supply changes seasonly."
+output: html_document
+date: "2024-02-02"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Title: The Yellow Faced Bombus and how the food supply changes seasonly throughout the state of Oregon. 
+
+Data:
+  Oregon Bee Atlas; information about where the bee has been-
+      https://www.inaturalist.org/taxa/57689-Bombus-vosnesenskii
+      
+  The temperature of each month in Oregon (website shows, average temp, max/min temp, and percipitation) -
+      https://data.citizen-times.com/weather-data/oregon/41/2021-01-01/table/
+      
+  Diet of the Yellow faced bombus consists of: Blue Hydrangea, Lupinus,                 Eriogonum, Phacelia, Clarkia, and Ericameria
+          Lupinus (mid april- june)-         https://www.oregon.gov/oda/shared/Documents/Publications/PlantConservation/LupinusOreganusProfile.pdf
+          
+Blue Hydrangea - 
+https://landscapeplants.oregonstate.edu/plants/hydrangea-macrophylla
+
+Eriogonum (june- september, october in higher elevations) https://extension.oregonstate.edu/gardening/pollinators/eriogonum-umbellatum-sulphur-flower-buckwheat
+
+Phacelia (april - july) -   https://blogs.oregonstate.edu/gardenecologylab/tag/phacelia/
+
+Clarkia (fall and spring) - https://blogs.oregonstate.edu/gardenecologylab/tag/clarkia-amoena/
+
+Ericameria (june - november) https://oregonflora.org/taxa/garden.php?taxon=4890 and https://oregonflora.org/taxa/index.php?tid=13000 (the second link has a map of the locations)
+  
+Methods:
+- gradient of interaction of the bee with the plant population, overlay weather to see seasonal changes
+- Spacial data 
+- plotting the month with the most popular plant in relation to the Yellow face Bombus diet. 
