@@ -1,0 +1,201 @@
+---
+title: "Exploring bee-related spatial data"
+output: github_document
+author:
+  - Lauren Ponisio
+---
+
+<!-- Lesson Overview -->
+
+# Conservation/ecology Topics 
+
+> - Species distributions 
+
+# Computational Topics
+> -  Convert a data frame to a spatial object.
+> -  Plot multiple spatial layers using
+
+-------------------------------
+```{r load-libraries, echo=FALSE, results="hide", message=FALSE, warning=FALSE}
+library(terra)
+library(ggplot2)
+library(dplyr)
+library(sf)
+```
+
+# Oregon bee atlas data exploration 
+
+Import the OBA data from 2018 and 2019 what you favorite parsing function (in the data folder of this lab's zip, converted to a .csv)
+
+# Excersize 1.1
+```{r}
+
+OBA_data18 <- read.csv("data/2018_occurrence.csv")
+
+OBA_data19 <- read.csv("data/2019_occurrence.csv")
+
+```
+
+# Excersize 1.2
+It will be cumbersome to deal with each dataframe individually. Are the column names in the identical order
+such that you could use `rbind()` (row bind) to bind them together? Some combination of the functions `colnames()`, `identical()`
+
+```{r}
+identical(colnames(OBA_data18), colnames(OBA_data19)) 
+combo_OBA <- rbind(OBA_data18, OBA_data19)
+```
+
+# Excersize 1.3
+Find the column related to a specimens species ID. Use `sort()` and `unique()` to print the unique values in alphabetical order.  How many species are there? 
+
+```{r}
+order_combo_OBA <- sort(unique(combo_OBA$species)) 
+print(order_combo_OBA)
+```
+```{r}
+length(order_combo_OBA)
+```
+
+Some specimens are not identified to species, only genus. How is this reflected in the data? 
+ANSWER THIS LATER 
+
+# Excersize 1.4
+So many bees, so little time. Count up the occurrences of each bee species, and subset the data to bees that have been seen at least two times. 
+You can use the tidyverse or any other functions in R that you like. How many species are there? 
+
+```{r}
+bees <- subset(order_combo_OBA, order_combo_OBA >= 2)
+```
+
+Google a few bee names (that have been seen > 2 times) and find one with an a look that resonates with you.
+
+What is the name of your bee? 
+    Andrena prunorum
+
+Import the photos into Rmarkdown below (hint: googling bee name "discover life" or "inat" can often get you a photo. Many bees will no have any photos :( 
+![](/Users/averyharff/Desktop/BI 410L Data Sci Ecol Conserv/Andrena_prunorum,_female,_side,I_SD5693.jpeg){alt='Andrena prunorum'}
+
+# Excersize 2.1
+How that have chosen your spirit bee, we would like to plot it's distribution. What is the crs of the data? Hint: it is the same as what inat uses because all bees have a georeferenced plant host. If the data is in lat long, it is "unprojected" so only a datum will be listed. 
+
+```{r}
+unique(combo_OBA$issue)
+#create shape files DATUM_ASSUMED_WGS84
+```
+
+# Excersize 2.2. 
+Extract the X and Y locations for your species only from the data and create a spatial object. Don't forget to set the CRS! Hint 1: consider what other data you would like to keep as attributes, for example what flower they were foraging on. Hint 2: Remember the lat is y and long is x. 
+
+```{r}
+apOBA <- combo_OBA %>% 
+          filter(species=="Andrena prunorum") %>% 
+          select(x = decimalLongitude,y = decimalLatitude, associatedTaxa)
+print(apOBA)
+
+location_apOBA<- st_as_sf(apOBA, coords = c("x", "y"), crs= crs("EPSG:4326")) 
+              
+View(location_apOBA)
+```
+
+# Excersize 2.3
+Plot your exciting bee data!
+
+```{r plot-data-points}
+ggplot() +
+  geom_sf(data = location_apOBA) +
+  ggtitle("Andrena prunorum Location")
+```
+
+Not so exciting without some kind of background... 
+
+# Excersize 2.4
+Luckily we can download basemaps into R using the map_data function in ggplot (amoung many others). There is an example for retrieving the Oregon county polygons. 
+
+```{r plot-or}
+or <- map_data("county", "oregon") %>% 
+  select(lon = long, lat, group, id = subregion) 
+
+ggplot() +
+  geom_polygon(data = or, aes(x = lon, y = lat, group=group), color = 'darkorchid1', fill = NA) +
+  ggtitle("Andrena prunorum Location in Oregon")
+
+```
+
+Add your species's points to your choice or an Oregon basemap. 
+
+```{r plot-data-points-basemap}
+#geompolygon aes(group=group )
+ggplot() +
+  geom_sf(data = location_apOBA, color='navyblue') +
+  geom_polygon(data = or, aes(x = lon, y = lat, group=group), color = 'purple', fill = NA) +
+  ggtitle("Andrena prunorum Location in Oregon")
+```
+# Excersize 2.5
+
+Here is your moment to explore your cartographic skills. 
+
+* 1. Add another spatial layer relevant to your final project and tweek the Oregon map in anyway that is useful/visually appealing. You may need to crop that layer to the extent of your species's distribution. 
+
+* 2. Color your points according to some data attribute and add a legend (month collected, county, collector, associated plant, whatever you think is interesting). You may need to circle back to 2.1 to save
+additional attributes when you converted the dataframe to a spatial object. 
+
+* 3. Fine-tune your map: add a title, make sure the legend label makes sense, add a scale bar (google "add scale bar map ggplot" and choose your favorite package). All maps must always have a scale bar. You can add a N arrow as well, though some cartographers argue that is only necessary if N isn't at the top of the map.
+
+* 4. Write a figure caption for your map explaining any interesting trends you see. 
+
+* 5. Export you cropped layer to a .shp so you can use it again for your final project.
+
+* 6. Push this lab to your github repo (just the .Rmd, don't push the data!)
+
+```{r plot-creative}
+library(raster)
+# stack .bil 2018 and 2019 into one file (raster stack)
+# once stacked make sure raster is same datum as bee datum change temp to bee datum 
+# 
+
+tempavg_or2018 <- raster("/Users/averyharff/Downloads/PRISM_ppt_stable_4kmM3_2018_bil 2/PRISM_ppt_stable_4kmM3_2018_bil.bil")
+
+
+temp2019avg <- raster("/Users/averyharff/Downloads/PRISM_tmean_stable_4kmM3_201907_bil/PRISM_tmean_stable_4kmM3_201907_bil.bil")
+
+
+```
+
+
+```{r}
+#take crs of 
+
+tempavg_or_stack <- raster::stack(tempavg_or, layer=1)
+
+tempdatum_df <- as.data.frame(tempdatum)
+tempavg_or_df <- raster::projection(tempavg_or_stack, tempdatum) #look at demo 
+
+```
+
+
+```{r}
+
+```
+
+
+```{r}
+ggplot()+
+  geom_raster(data = tempcrsupdate, color = "") + #color by something specific within raster, like categories, examples in demo. dont add color let it select on its own. 
+  geom_sf(data = location_apOBA, color='navyblue') +
+  geom_polygon(data = or, aes(x = lon, y = lat, group=group), color = 'purple', fill = NA) +
+  ggtitle("Andrena prunorum Location in Oregon")
+```
+
+We are looking forward to seeing the maps you create! 
+
+# Excersize 2.6
+
+For your final projects, you will likely need to come up with summary statistics that describes the areas around where bees are captured. 
+1. Using the distribution of your chosen bee and the spatial layer you imported in 2.6, extract a meaningful summary statistics from your spatial layer within a buffer of 500, 750, and 1000 km.
+2. Create a plot that illustrates this summary data (box plot, barplot, scatter plot, historgram). 
+3. Create a map of your cropped spatial data.
+
+```{r buffers}
+
+#Oregon bee data and what I am using for my project and plot them together. Push into get hub: Add, commit, push
+```
