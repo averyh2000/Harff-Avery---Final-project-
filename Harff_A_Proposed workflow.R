@@ -12,13 +12,21 @@ a certain location, but rather the Bombus vosnesenksii can be spotted in subarbs
 modified landscapes (Nature Serve Explorer). Because the bee has been spotted in numerous places in the west coast,
 the temperature does vary and that effects the bumbus food supply and how the bumbus keep the colony alive and functioning (Strange et al. 2023). 
 Thus, the interest is peeked on how the yellow faced bombus supports the colony in the midst of the changing vegitation along with
-the vastly differing climate temperatues. 
+the vastly differing climate temperatues. It is questioned how the bee maintains the colony under varying weather conditions/season. It is hypothesized that 
+the yellow faced bombus food supply will be inpacted in the winter seasons and how the diet changes as the vegitation 
+of the landscape scape changes. I predict that the yellow faced bombus colony size will decrease as the weather decreases. I also predict 
+that the food chain will have a paralleling relationship with the changing seasons, meaning, as winter appraches the vegitation differs and
+yellow faced bompus prefered food/vegitation decreases.
+
 
   b) Past work and data available
-James P. Strange addressed the issue of colony size changing with the climate conditions. Strange analized colony size from 2009 - 2019, 
-he found that the colony size in the winter increases because the Bombus vosnesenksii produces more drone/ worker bees compaired to other 
-species of bees. Through his research he was able to help conservationalist with different techniques, such as, utilizing T-tests to compair
-two different speices and the nesting percentage. 
+James P. Strange addressed the issue of colony size changing with the climate conditions. 
+Strange analized colony size from 2009 - 2019, he found that the colony size in the winter increases 
+because the Bombus vosnesenksii produces more drone/ worker bees compaired to other 
+species of bees. Through his research he was able to help conservationalist with different techniques, such as, 
+utilizing T-tests to compair two different speices and the nesting percentage. Strange captured the Queen Bee from 
+the nests because often times the nests are below ground (Strange et al. 2023). The nest observations are in a 
+controlled labratory leading to the controlled success of nest counts (Strange et al. 2023). 
 
 Data available 
 For the colony size I could use the tables that Strange collected.
@@ -49,12 +57,7 @@ and its food supply in the varying climates. The graphics can dipict the colony 
 changes the yellow faced bompus food preference. 
 
   d) Hypotheses/questions
-
-It is questioned how the bee maintains the colony under varying weather conditions/season. It is hypothesized that 
-the yellow faced bombus food supply will be inpacted in the winter seasons and how the diet changes as the vegitation 
-of the landscape scape changes. I predict that the yellow faced bombus colony size will decrease as the weather decreases. I also predict 
-that the food chain will have a paralleling relationship with the changing seasons, meaning, as winter appraches the vegitation differs and
-yellow faced bompus prefered food/vegitation decreases. The whole goal is to see the differences in interaction between the bombus and food supply as the weather changes, also the difference in colony size 
+ The whole goal is to see the differences in interaction between the bombus and food supply as the weather changes, also the difference in colony size 
 as the weather and food supply changes. I am curious about the changes in weather and how it influcenes the bombus food chain and colony size. 
 
 2. Dataset Identification
