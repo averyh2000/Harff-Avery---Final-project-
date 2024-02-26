@@ -1,0 +1,244 @@
+---
+title: "Using regular expressions"
+output: 
+ pdf_document: default  
+  html_document: default
+always_allow_html: true 
+
+author:
+  - Lauren Ponisio
+---
+
+<!-- Lesson Overview -->
+
+# Conservation/ecology Topics 
+
+> - Species distributions 
+
+# Computational Topics
+> -  Use regular expressions to clean and catagorize data
+
+-------------------------------
+```{r load-libraries, echo=FALSE, results="hide", message=FALSE, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(igraph)
+library(networkD3)
+update.packages("igraph")
+```
+
+# Oregon bee atlas data exploration 
+
+Import the OBA data from 2018 and 2019 what your favorite parsing function, and bind together the two years of data (as in lab 5). Call the compiled data oba. 
+
+# Excersize 1.1
+```{r}
+OBA_data18 <- read.csv("data/2018_occurrence.csv")
+
+OBA_data19 <- read.csv("data/2019_occurrence.csv")
+
+combo_OBA <- rbind(OBA_data18,OBA_data19)
+```
+
+Examine the unique entries of 'associatedTaxa'. What are at least two patterns in the associated taxa string what should be removed if we want consistent plant names? 
+
+1. sometimes "\"foraging on\" : and sometimes "foraging on\" : 
+2. \" before and after the plant name 
+
+```{r}
+combo_OBA$associatedTaxa <- gsub("\"*foraging\\son\"*\\s:\\s\"", "", combo_OBA$associatedTaxa) 
+
+combo_OBA$associatedTaxa <- gsub("\"" ,"", combo_OBA$associatedTaxa) 
+
+
+```
+# Excersize 1.2
+
+In lecture I used a brute force pattern to remove some of these issues. Now that we are familiar with regular expressions we can do better. 
+Resolve all of the issues with the associated taxa column in *at most two* calls to `gsub()` or any function that uses regular expressions. You reassign the contents of the column associatedTaxa or create a new column. Return the sorted, unique values, ex: sort(unique(oba$associatedTaxa))
+
+Hint: You must \ any special characters. For example to use \s (matches any space, tab, or newline) you must use \\s in your pattern.
+
+```{r}
+combo_OBA$associatedTaxa <- gsub("[[:punct:]]", "\\\\$0", combo_OBA$associatedTaxa)
+combo_OBA$associatedTaxa <- gsub("\\\\s+", " ", combo_OBA$associatedTaxa)
+
+sorted_Plants <- sort(unique(combo_OBA$associatedTaxa))
+
+sorted_Plants
+```
+
+Examining the unique plant taxa, "Weedy" and "Weedy yellow comp." popped out as other problems. In addition, some have two plant species seperated by a ";". Since we cannot really do much with the second species and leaving it will cause that species combination to be treated like a species, we will drop the second plant.  
+
+We used `gsub` above to match a pattern and replace it with something else. `gsub` is part of a family of regex functions, including `grep`, see ?grep for all of the options. `strsplit` is a related function that splits a string at a character or pattern.
+
+Below is an example of using grepl to find the elements of associated taxa that have a ";", then using strsplit to split those strings at the ";". Strplit returns a list with the split string as seperate elements. Lastly sapply (smart apply) applies the mini function that grabs the first element from the list strsplit created. 
+
+```{r}
+combo_OBA$associatedTaxa <- gsub("Weedy yellow comp.", "", combo_OBA$associatedTaxa)
+combo_OBA$associatedTaxa <- gsub("Weedy", "", combo_OBA$associatedTaxa)
+
+combo_OBA$associatedTaxa[grepl(";", combo_OBA$associatedTaxa)] <- sapply(strsplit(combo_OBA$associatedTaxa[grepl(";", combo_OBA$associatedTaxa)], ";"), function(x) x[1])
+
+```
+
+# Excersize 2.1
+Some plant species are resolved to species/subspecies, others to genus and others to family. If there are two or three words, we can assume the plant is resolved to species and subspecies, respectively. If there is only one word, this could be a genus or a family name. Family names always end in "aceae", for example Lamiaceae (mints), Asteraceae (daisies). 
+
+
+We want to make a new column called plantResolution and assign it to "Family", "Genus" or "Species" depending on the level of resolution associated taxa is resolved to. We will do this in two steps. 
+
+First use regular expressions to count up the number of words in each element of associated taxa. Assign the count to a new column called plantTaxaWordCount. Print the first 10 elements.
+
+Hint: `gregexpr` may be useful, or `strsplit` in combination with `sapply` or a for loop. 
+Hint hint: Don't forget to consider empty strings (i.e., no plant taxa). 
+
+
+```{r}
+combo_OBA$plantTaxaWordCount <- sapply(combo_OBA$associatedTaxa, function(x) {
+
+  if (length(gregexpr("\\w+", x)[[1]]) == 0) {
+    return(0) 
+  } else {
+    return(length(gregexpr("\\w+", x)[[1]])) 
+  }
+})
+
+
+print(combo_OBA$plantTaxaWordCount[1:10])
+
+
+combo_OBA$plantResolution <- sapply(combo_OBA$plantTaxaWordCount, function(count) {
+  if (count == 0) {
+    return("") 
+  } else if (count == 1) {
+   
+    return(ifelse(grepl("aceae$", combo_OBA$associatedTaxa[count]), "Family", "Genus"))
+  } else {
+    return("Species")
+  }
+})
+
+
+print(combo_OBA$plantResolution[1:10])
+```
+
+# Excersize 2.2
+Write a for loop to assigned each entry of the column plantResolution to be "family", "genus" or "species". `table()` the final result. If there is no associated taxa, assign the value to be NA. 
+Hint: Don't forget to initialize the new column. Starting with all NAs may be useful. 
+Hint hint: The function `ifelse` returns one value if a TRUE and another if FALSE. It could be useful depending on your approach. 
+Hint hint hint: `grepl` will return or TRUE or FALSE depending on whether it finds the pattern. 
+
+```{r}
+combo_OBA$plantResolution <- NA
+for (i in seq_len(nrow(combo_OBA))) {
+
+  if (nchar(combo_OBA$associatedTaxa[i]) > 0) {
+    wordCount <- length(gregexpr("\\w+", combo_OBA$associatedTaxa[i])[[1]])
+    if (wordCount == 1) {
+      combo_OBA$plantResolution[i] <- ifelse(grepl("aceae$", combo_OBA$associatedTaxa[i]), "Family", "Genus")
+    } else {
+      combo_OBA$plantResolution[i] <- "Species" 
+    }
+  }
+}
+
+print(table(combo_OBA$plantResolution))
+```
+
+# Excersize 2.3
+Create a new column called plantGenus that is the genus if the associated taxa was resolved to species or genus, and NA if it was resolved to family. 
+```{r}
+
+combo_OBA$plantGenus <- ifelse(combo_OBA$plantResolution == "Family", NA, combo_OBA$associatedTaxa)
+
+print(head(combo_OBA))
+
+```
+
+# Excersize 3.1
+
+Choose a genus other than Bombus with at least 10 species. Create a network for all the species of that bee genus, and their species-level plant interactions. Plot the networks with bee species as only color, and plants as another. 
+```{r}
+plant_bee <- plant_bee[plant_bee$associatedTaxa != "",]
+head(plant_bee)
+
+plant_bee <- combo_OBA[combo_OBA$genus == "Andrena", ]
+plant_bee <- plant_bee[, c("species", "associatedTaxa")]
+head(plant_bee)
+
+## first remove the "foraging on"
+plant_bee$associatedTaxa <- gsub("foraging on : \"", "", plant_bee$associatedTaxa)
+## then the leftover space
+plant_bee$associatedTaxa <- gsub("\"", "", plant_bee$associatedTaxa)
+head(plant_bee$associatedTaxa)
+
+table(plant_bee$species)
+table(plant_bee$associatedTaxa)
+```
+
+
+```{r}
+plantBee_adj <- table(plant_bee)
+dim(plantBee_adj)
+
+andrena_subset <- subset(combo_OBA, genus == "Andrena") #already subse this above for on line 162.
+
+#andrena_adj <- 
+table(andrena_subset$species) 
+
+table(andrena_subset$associatedTaxa)
+
+
+g_plantBee <- graph_from_data_frame(plantBee_adj) 
+g_plantBee
+
+## find modules
+mod_plantB <- cluster_walktrap(g_plantBee)
+## assign vertices to modules
+groups <- membership(mod_plantB)
+
+
+ColourScale <- 'd3.scaleOrdinal()
+            .domain(["plants", "bees"])
+           .range(["purple", "green"]);'
+
+## convert to a network 3d object
+g_plantB_net3d <- igraph_to_networkD3(g_plantBee, group=groups, 
+                                       what = "both")
+## plot the bumble-plant network
+forceNetwork(Links = g_plantB_net3d$links,
+             Nodes = g_plantB_net3d$nodes,
+             colourScale = JS(ColourScale),
+            Source = "source", Target = "target",
+            Value = "value", opacityNoHover = 0.9, NodeID = "name",
+             Group = "group", opacity = 0.8, zoom=TRUE)
+```
+
+# Excersize 3.2
+
+Create a network for the bee species-plant genus interactions. Plot the networks with bee species as only color, and plants as another. 
+
+```{r}
+mod_plantB <- cluster_walktrap(g_plantBee)
+## assign vertices to modules
+groups <- membership(mod_plantB)
+
+
+ColourScale <- 'd3.scaleOrdinal()
+            .domain(["bees", "plants"])
+           .range(["pink", "yellow"]);'
+
+## convert to a network 3d object
+g_plantB_net3d <- igraph_to_networkD3(g_plantBee, group=groups, 
+                                      what = "both")
+## plot the bumble-plant network
+forceNetwork(Links = g_plantB_net3d$links,
+             Nodes = g_plantB_net3d$nodes,
+             colourScale = JS(ColourScale),
+            Source = "source", Target = "target",
+            Value = "value", opacityNoHover = 0.9, NodeID = "name",
+             Group = "group", opacity = 0.8, zoom=TRUE)
+
+
+```
