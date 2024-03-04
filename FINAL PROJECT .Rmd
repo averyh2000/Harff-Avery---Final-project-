@@ -1,0 +1,197 @@
+---
+title: "Final project"
+author: Avery Harff 
+output: html_document
+date: "2024-02-27"
+---
+ Question: The goal is to analyze how the Bombus Vosnesenkii interacts with different plants across Oregon in varying temperatures, climates (wet/ dry season), and altitude. 
+ 
+```{r}
+library(tidyverse)
+library(bipartite)
+library(terra)
+library(ggplot2)
+library(dplyr)
+library(raster)
+library(sf)
+library(readxl)
+library(lubridate)
+```
+
+What are the tip 5 most abundant bee species and most visited flower species in the top 5 biggest cities in Oregon? April-September 
+
+Does the Min or max temperature for each month in each city affect the number of bee species or flower species observed?
+
+Top 5 cities in Oregon
+1 - Portland 
+2 - Eugene
+3 - Salem
+4 - medford
+5 - bend
+
+ouline of eugene
+```{r}
+#shapefiles of the boundries of the five major cities
+
+portland <- read_sf("/Users/averyharff/Downloads/portland/City_Boundaries.shp")
+
+eugene <- read_sf("/Users/averyharff/Downloads/Eugene_Zoning___Hub_-8431398599973602668/Eugene_Zoning.shp")
+
+salem <- read_sf("/Users/averyharff/Downloads/CityLimits/CityLimits.shp")
+
+medford <- read_sf("/Users/averyharff/Downloads/medfordCity_Limits (1)/City_Limits.shp")
+
+bend <- read_sf("/Users/averyharff/Downloads/bend/Zoning.shp")
+```
+Dataframe of city, year, month, bee and plant
+```{r}
+OBA <- read_excel("~/Downloads/OBA_2018-2023_Ponisio.xlsx")
+OBA$Year <- OBA$`Year 1`
+
+```
+
+```{r}
+## data cleaning, removing all the spaces commas and periods not needed
+OBA$`Abbreviated Location` <- trimws(OBA$`Abbreviated Location`)
+OBA$`Abbreviated Location` <- sub(" .*", "", OBA$`Abbreviated Location`)
+OBA$`Abbreviated Location` <- sub(",$","", OBA$`Abbreviated Location`)
+```
+
+```{r}
+#making dataframe using filter 
+
+years <- c("2018", "2019")
+cities <- c("Eugene", "Portland", "Salem", "Medford", "Bend")
+month <- c("April", "May", "June", "July", "August", "September")
+OBA18_19 <- OBA %>% 
+  filter(Year %in% years) %>%
+  filter(`Abbreviated Location` %in% cities) %>% ## %in% telling filter to only use what is in the list 
+  filter(MonthJul %in% month)
+
+
+OBA18_19 <- OBA18_19[c("Dec. Long.", "Dec. Lat.","Abbreviated Location", "MonthJul", "Year 1", "Associated plant", "Species")]
+
+
+
+bee_plant_count <- OBA18_19 %>%  count(Species, `Associated plant`)
+
+```
+
+
+```{r}
+minTemp18 <- raster("/Users/averyharff/Desktop/18TEMPMINPRISM_tmin_stable_4kmM3_2018_all_bil/PRISM_tmin_stable_4kmM3_2018_bil.bil")
+
+maxtemp18 <- raster("/Users/averyharff/Desktop/18MaxPPRISM_tmax_stable_4kmM3_2018_all_bil/PRISM_tmax_stable_4kmM3_2018_bil.bil")
+
+mintemp19 <- raster("/Users/averyharff/Desktop/19MINPRISM_tmin_stable_4kmM3_2019_all_bil/PRISM_tmin_stable_4kmM3_2019_bil.bil")
+
+maxtemp19 <- raster("/Users/averyharff/Desktop/MAXTEMP19PRISM_tmax_stable_4kmM3_2019_all_bil/PRISM_tmax_stable_4kmM3_2019_bil.bil")
+```
+
+```{r}
+#convert to df
+min18_df <- as.data.frame(minTemp18, xy = TRUE)
+maxtemp18_df <- as.data.frame(maxtemp18, xy = TRUE)
+mintemp19_df <- as.data.frame(mintemp19, xy = TRUE)
+maxtemp19_df <- as.data.frame(maxtemp19, xy = TRUE)
+```
+
+```{r}
+#extracting data from the raster that is now a df to add to the table of months, years, plants, and bees
+```
+
+Top 5 cities in Oregon
+1 - Portland 
+2 - Eugene
+3 - Salem
+4 - medford
+5 - bend
+
+```{r}
+ 
+```
+
+```{r}
+
+```
+Most popular most visited plant in each country, focus on country and most pop town and what flower it feeds on.  POPYLAR BEE AND PLANT 
+- have points, make buffers, overlay oba data. All counties 
+
+Making table for city, month, min/max temp, and bee/flower
+```{r}
+
+```
+
+
+```{r}
+library(kableExtra)
+
+table1 <- data.frame(
+  # City = c("Portland", "Portland", "Portland", "Portland", "Portland", "Portland"),
+  # Year = c("2018", "2018", "2018", "2018", "2018", "2018"),
+  Month = c("April", "May", "June", "July", "August", "September"),
+  Max_Temp = c("T1", "T2", "T3", "T4", "T5", "T6"),
+  Min_Temp = c("T1", "T2", "T3", "T4", "T5", "T6"),
+  Bee_species = c("N1", "N2", "N3", "N4", "N5", "N6"),
+  Flower_species = c("N1", "N2", "N3", "N4", "N5", "N6")
+)
+
+table1 %>%
+  kbl() %>%
+  kable_minimal()
+
+
+
+```
+
+
+graph the average precipitation levels in 2019 and 2018 in Oregon (scatterplot, continuouslty, color points by season)
+```{r}
+Oregon Prism website has data or 
+https://www.arcgis.com/home/item.html?id=dab2424ee1d9472ab126a771aa334990
+
+rain_levels <- read_xml()
+```
+
+sort bee plant and bee data into columns of rows of the post popular bees and plants. use a network for the plants and the city.  
+```{r}
+
+
+```
+
+make a table of the most popular cities (5) and plot the year month max temp, min temp, # bee species, # flower species
+```{r}
+
+```
+
+raster - oregon prism
+```{r}
+
+```
+oba - point data
+city -  spacial
+```{r}
+
+```
+plant - network
+```{r}
+
+```
+
+
+```{r}
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
