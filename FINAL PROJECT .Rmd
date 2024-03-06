@@ -35,7 +35,9 @@ ouline of eugene
 
 portland <- read_sf("/Users/averyharff/Downloads/portland/City_Boundaries.shp")
 
+
 eugene <- read_sf("/Users/averyharff/Downloads/Eugene_Zoning___Hub_-8431398599973602668/Eugene_Zoning.shp")
+eugene_vect <- vect(eugene)
 
 salem <- read_sf("/Users/averyharff/Downloads/CityLimits/CityLimits.shp")
 
@@ -68,10 +70,7 @@ OBA18_19 <- OBA %>%
   filter(`Abbreviated Location` %in% cities) %>% ## %in% telling filter to only use what is in the list 
   filter(MonthJul %in% month)
 
-
 OBA18_19 <- OBA18_19[c("Dec. Long.", "Dec. Lat.","Abbreviated Location", "MonthJul", "Year 1", "Associated plant", "Species")]
-
-
 
 bee_plant_count <- OBA18_19 %>%  count(Species, `Associated plant`)
 
@@ -79,33 +78,73 @@ bee_plant_count <- OBA18_19 %>%  count(Species, `Associated plant`)
 
 
 ```{r}
-minTemp18 <- raster("/Users/averyharff/Desktop/18TEMPMINPRISM_tmin_stable_4kmM3_2018_all_bil/PRISM_tmin_stable_4kmM3_2018_bil.bil")
+#dont have to load until plot 
+minTemp18 <- rast("/Users/averyharff/Desktop/18TEMPMINPRISM_tmin_stable_4kmM3_2018_all_bil/PRISM_tmin_stable_4kmM3_2018_bil.bil")
 
-maxtemp18 <- raster("/Users/averyharff/Desktop/18MaxPPRISM_tmax_stable_4kmM3_2018_all_bil/PRISM_tmax_stable_4kmM3_2018_bil.bil")
+maxtemp18 <- rast("/Users/averyharff/Desktop/18MaxPPRISM_tmax_stable_4kmM3_2018_all_bil/PRISM_tmax_stable_4kmM3_2018_bil.bil")
 
-mintemp19 <- raster("/Users/averyharff/Desktop/19MINPRISM_tmin_stable_4kmM3_2019_all_bil/PRISM_tmin_stable_4kmM3_2019_bil.bil")
+mintemp19 <- rast("/Users/averyharff/Desktop/19MINPRISM_tmin_stable_4kmM3_2019_all_bil/PRISM_tmin_stable_4kmM3_2019_bil.bil")
 
-maxtemp19 <- raster("/Users/averyharff/Desktop/MAXTEMP19PRISM_tmax_stable_4kmM3_2019_all_bil/PRISM_tmax_stable_4kmM3_2019_bil.bil")
+maxtemp19 <- rast("/Users/averyharff/Desktop/MAXTEMP19PRISM_tmax_stable_4kmM3_2019_all_bil/PRISM_tmax_stable_4kmM3_2019_bil.bil")
+
 ```
 
 ```{r}
-#convert to df
-min18_df <- as.data.frame(minTemp18, xy = TRUE)
-maxtemp18_df <- as.data.frame(maxtemp18, xy = TRUE)
-mintemp19_df <- as.data.frame(mintemp19, xy = TRUE)
-maxtemp19_df <- as.data.frame(maxtemp19, xy = TRUE)
+#function will load in rasterfile and city shape file name, then crop raster to the city shape file, return to temp average for city 
+cropped_tempCity <- function(rasterfilename_min, rasterfilename_max,  cityfilename){
+                    out_min <- terra::extract(x = rasterfilename_min, y = cityfilename,
+                                fun = mean)
+                     out_max <- terra::extract(x = rasterfilename_max, y = cityfilename,
+                                fun = mean)
+                    return(c(min=out_min[,2], max=out_max[,2]))
+}
+
+#loading in data for min and max temperatures of portland. 
+temp2018_eugene <- cropped_tempCity(minTemp18, maxtemp18, eugene_vect)
+
+min2019_Portland <- cropped_tempCity("/Users/averyharff/Desktop/19MINPRISM_tmin_stable_4kmM3_2019_all_bil/PRISM_tmin_stable_4kmM3_2019_bil.bil", "/Users/averyharff/Downloads/portland/City_Boundaries.shp")
+
+max2019_Portland <- cropped_tempCity("/Users/averyharff/Desktop/19MINPRISM_tmin_stable_4kmM3_2019_all_bil/PRISM_tmin_stable_4kmM3_2019_bil.bil", "/Users/averyharff/Downloads/portland/City_Boundaries.shp")
 ```
 
 ```{r}
-#extracting data from the raster that is now a df to add to the table of months, years, plants, and bees
+min2018_Eugene <- cropped_tempCity("/Users/averyharff/Desktop/18TEMPMINPRISM_tmin_stable_4kmM3_2018_all_bil/PRISM_tmin_stable_4kmM3_2018_bil.bil", "/Users/averyharff/Downloads/Eugene_Zoning___Hub_-8431398599973602668/Eugene_Zoning.shp")
+
+max2018_Eugene <- cropped_tempCity("/Users/averyharff/Desktop/18TEMPMINPRISM_tmin_stable_4kmM3_2018_all_bil/PRISM_tmin_stable_4kmM3_2018_bil.bil", "/Users/averyharff/Downloads/Eugene_Zoning___Hub_-8431398599973602668/Eugene_Zoning.shp")
+
+min2019_Eugene <- cropped_tempCity("/Users/averyharff/Desktop/19MINPRISM_tmin_stable_4kmM3_2019_all_bil/PRISM_tmin_stable_4kmM3_2019_bil.bil", "/Users/averyharff/Downloads/Eugene_Zoning___Hub_-8431398599973602668/Eugene_Zoning.shp")
+
+max2019_Eugene <- cropped_tempCity("/Users/averyharff/Desktop/19MINPRISM_tmin_stable_4kmM3_2019_all_bil/PRISM_tmin_stable_4kmM3_2019_bil.bil", "/Users/averyharff/Downloads/Eugene_Zoning___Hub_-8431398599973602668/Eugene_Zoning.shp")
+
+min18_Bend <- cropped_tempCity("/Users/averyharff/Desktop/18TEMPMINPRISM_tmin_stable_4kmM3_2018_all_bil/PRISM_tmin_stable_4kmM3_2018_bil.bil", "/Users/averyharff/Downloads/bend/Zoning.shp")
+
+max18_Bend <- cropped_tempCity("/Users/averyharff/Desktop/18TEMPMINPRISM_tmin_stable_4kmM3_2018_all_bil/PRISM_tmin_stable_4kmM3_2018_bil.bil","/Users/averyharff/Downloads/bend/Zoning.shp")
+
+min19_Bend <- cropped_tempCity("/Users/averyharff/Desktop/19MINPRISM_tmin_stable_4kmM3_2019_all_bil/PRISM_tmin_stable_4kmM3_2019_bil.bil","/Users/averyharff/Downloads/bend/Zoning.shp")
+
+max19_Bend <- cropped_tempCity("/Users/averyharff/Desktop/19MINPRISM_tmin_stable_4kmM3_2019_all_bil/PRISM_tmin_stable_4kmM3_2019_bil.bil","/Users/averyharff/Downloads/bend/Zoning.shp")
+
+min18_salem <- cropped_tempCity("/Users/averyharff/Desktop/18TEMPMINPRISM_tmin_stable_4kmM3_2018_all_bil/PRISM_tmin_stable_4kmM3_2018_bil.bil", "/Users/averyharff/Downloads/CityLimits/CityLimits.shp")
+
+max18_salem <- cropped_tempCity("/Users/averyharff/Desktop/18TEMPMINPRISM_tmin_stable_4kmM3_2018_all_bil/PRISM_tmin_stable_4kmM3_2018_bil.bil","/Users/averyharff/Downloads/CityLimits/CityLimits.shp")
+
+min19_salem <- cropped_tempCity("/Users/averyharff/Desktop/19MINPRISM_tmin_stable_4kmM3_2019_all_bil/PRISM_tmin_stable_4kmM3_2019_bil.bil","/Users/averyharff/Downloads/CityLimits/CityLimits.shp")
+
+max19_salem <- cropped_tempCity("/Users/averyharff/Desktop/19MINPRISM_tmin_stable_4kmM3_2019_all_bil/PRISM_tmin_stable_4kmM3_2019_bil.bil","/Users/averyharff/Downloads/CityLimits/CityLimits.shp")
+
+min18_medford <- cropped_tempCity("/Users/averyharff/Desktop/18TEMPMINPRISM_tmin_stable_4kmM3_2018_all_bil/PRISM_tmin_stable_4kmM3_2018_bil.bil", "/Users/averyharff/Downloads/medfordCity_Limits (1)/City_Limits.shp")
+
+max18_medford <- cropped_tempCity("/Users/averyharff/Desktop/18TEMPMINPRISM_tmin_stable_4kmM3_2018_all_bil/PRISM_tmin_stable_4kmM3_2018_bil.bil", "/Users/averyharff/Downloads/medfordCity_Limits (1)/City_Limits.shp")
+
+min19_medford <- cropped_tempCity("/Users/averyharff/Desktop/19MINPRISM_tmin_stable_4kmM3_2019_all_bil/PRISM_tmin_stable_4kmM3_2019_bil.bil","/Users/averyharff/Downloads/medfordCity_Limits (1)/City_Limits.shp")
+
+max19_medford <- cropped_tempCity("/Users/averyharff/Desktop/19MINPRISM_tmin_stable_4kmM3_2019_all_bil/PRISM_tmin_stable_4kmM3_2019_bil.bil","/Users/averyharff/Downloads/medfordCity_Limits (1)/City_Limits.shp")
 ```
 
-Top 5 cities in Oregon
-1 - Portland 
-2 - Eugene
-3 - Salem
-4 - medford
-5 - bend
+turn all cities into one list, make a four loop for each element of list use function created uptop. it will extract values from eugene and salem. return(give me back a table with max and min temp of each city) one for 18 one for 19. use city as uniting code for the table 
+```{r}
+
+```
 
 ```{r}
  
@@ -114,33 +153,13 @@ Top 5 cities in Oregon
 ```{r}
 
 ```
-Most popular most visited plant in each country, focus on country and most pop town and what flower it feeds on.  POPYLAR BEE AND PLANT 
-- have points, make buffers, overlay oba data. All counties 
 
-Making table for city, month, min/max temp, and bee/flower
 ```{r}
 
 ```
 
 
 ```{r}
-library(kableExtra)
-
-table1 <- data.frame(
-  # City = c("Portland", "Portland", "Portland", "Portland", "Portland", "Portland"),
-  # Year = c("2018", "2018", "2018", "2018", "2018", "2018"),
-  Month = c("April", "May", "June", "July", "August", "September"),
-  Max_Temp = c("T1", "T2", "T3", "T4", "T5", "T6"),
-  Min_Temp = c("T1", "T2", "T3", "T4", "T5", "T6"),
-  Bee_species = c("N1", "N2", "N3", "N4", "N5", "N6"),
-  Flower_species = c("N1", "N2", "N3", "N4", "N5", "N6")
-)
-
-table1 %>%
-  kbl() %>%
-  kable_minimal()
-
-
 
 ```
 
