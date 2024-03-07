@@ -127,7 +127,7 @@ temp2019_medford <- cropped_tempCity(mintemp19, maxtemp19, medford_vect)
 
 turn all cities into one list, make a four loop for each element of list use function created uptop. it will extract values from eugene and salem. return(give me back a table with max and min temp of each city) one for 18 one for 19. use city as uniting code for the table 
 ```{r}
-
+#make list 
 ```
 
 ```{r}
