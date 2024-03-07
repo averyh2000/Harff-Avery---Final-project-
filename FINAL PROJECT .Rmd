@@ -34,16 +34,19 @@ ouline of eugene
 #shapefiles of the boundries of the five major cities
 
 portland <- read_sf("/Users/averyharff/Downloads/portland/City_Boundaries.shp")
-
+portland_vect <- vect(portland)
 
 eugene <- read_sf("/Users/averyharff/Downloads/Eugene_Zoning___Hub_-8431398599973602668/Eugene_Zoning.shp")
 eugene_vect <- vect(eugene)
 
 salem <- read_sf("/Users/averyharff/Downloads/CityLimits/CityLimits.shp")
+salem_vect <- vect(salem)
 
 medford <- read_sf("/Users/averyharff/Downloads/medfordCity_Limits (1)/City_Limits.shp")
+medford_vect <- vect(medford)
 
 bend <- read_sf("/Users/averyharff/Downloads/bend/Zoning.shp")
+bend_vect <- vect(bend)
 ```
 Dataframe of city, year, month, bee and plant
 ```{r}
@@ -102,43 +105,24 @@ cropped_tempCity <- function(rasterfilename_min, rasterfilename_max,  cityfilena
 #loading in data for min and max temperatures of portland. 
 temp2018_eugene <- cropped_tempCity(minTemp18, maxtemp18, eugene_vect)
 
-min2019_Portland <- cropped_tempCity("/Users/averyharff/Desktop/19MINPRISM_tmin_stable_4kmM3_2019_all_bil/PRISM_tmin_stable_4kmM3_2019_bil.bil", "/Users/averyharff/Downloads/portland/City_Boundaries.shp")
+temp2019_eugene <- cropped_tempCity(mintemp19, maxtemp19, eugene_vect)
 
-max2019_Portland <- cropped_tempCity("/Users/averyharff/Desktop/19MINPRISM_tmin_stable_4kmM3_2019_all_bil/PRISM_tmin_stable_4kmM3_2019_bil.bil", "/Users/averyharff/Downloads/portland/City_Boundaries.shp")
-```
+temp2018_portland <- cropped_tempCity(minTemp18, maxtemp18, portland_vect)
 
-```{r}
-min2018_Eugene <- cropped_tempCity("/Users/averyharff/Desktop/18TEMPMINPRISM_tmin_stable_4kmM3_2018_all_bil/PRISM_tmin_stable_4kmM3_2018_bil.bil", "/Users/averyharff/Downloads/Eugene_Zoning___Hub_-8431398599973602668/Eugene_Zoning.shp")
+temp2019_portland <- cropped_tempCity(mintemp19, maxtemp19, portland_vect)
 
-max2018_Eugene <- cropped_tempCity("/Users/averyharff/Desktop/18TEMPMINPRISM_tmin_stable_4kmM3_2018_all_bil/PRISM_tmin_stable_4kmM3_2018_bil.bil", "/Users/averyharff/Downloads/Eugene_Zoning___Hub_-8431398599973602668/Eugene_Zoning.shp")
+temp2018_salem <- cropped_tempCity(minTemp18, maxtemp18, salem_vect)
 
-min2019_Eugene <- cropped_tempCity("/Users/averyharff/Desktop/19MINPRISM_tmin_stable_4kmM3_2019_all_bil/PRISM_tmin_stable_4kmM3_2019_bil.bil", "/Users/averyharff/Downloads/Eugene_Zoning___Hub_-8431398599973602668/Eugene_Zoning.shp")
+temp2019_salem <- cropped_tempCity(mintemp19, maxtemp19, salem_vect)
 
-max2019_Eugene <- cropped_tempCity("/Users/averyharff/Desktop/19MINPRISM_tmin_stable_4kmM3_2019_all_bil/PRISM_tmin_stable_4kmM3_2019_bil.bil", "/Users/averyharff/Downloads/Eugene_Zoning___Hub_-8431398599973602668/Eugene_Zoning.shp")
+temp2018_bend <- cropped_tempCity(minTemp18, maxtemp18, bend_vect)
 
-min18_Bend <- cropped_tempCity("/Users/averyharff/Desktop/18TEMPMINPRISM_tmin_stable_4kmM3_2018_all_bil/PRISM_tmin_stable_4kmM3_2018_bil.bil", "/Users/averyharff/Downloads/bend/Zoning.shp")
+temp2019_bend <- cropped_tempCity(mintemp19, maxtemp19, bend_vect)
 
-max18_Bend <- cropped_tempCity("/Users/averyharff/Desktop/18TEMPMINPRISM_tmin_stable_4kmM3_2018_all_bil/PRISM_tmin_stable_4kmM3_2018_bil.bil","/Users/averyharff/Downloads/bend/Zoning.shp")
+temp2018_medford <- cropped_tempCity(minTemp18, maxtemp18, medford_vect)
 
-min19_Bend <- cropped_tempCity("/Users/averyharff/Desktop/19MINPRISM_tmin_stable_4kmM3_2019_all_bil/PRISM_tmin_stable_4kmM3_2019_bil.bil","/Users/averyharff/Downloads/bend/Zoning.shp")
+temp2019_medford <- cropped_tempCity(mintemp19, maxtemp19, medford_vect)
 
-max19_Bend <- cropped_tempCity("/Users/averyharff/Desktop/19MINPRISM_tmin_stable_4kmM3_2019_all_bil/PRISM_tmin_stable_4kmM3_2019_bil.bil","/Users/averyharff/Downloads/bend/Zoning.shp")
-
-min18_salem <- cropped_tempCity("/Users/averyharff/Desktop/18TEMPMINPRISM_tmin_stable_4kmM3_2018_all_bil/PRISM_tmin_stable_4kmM3_2018_bil.bil", "/Users/averyharff/Downloads/CityLimits/CityLimits.shp")
-
-max18_salem <- cropped_tempCity("/Users/averyharff/Desktop/18TEMPMINPRISM_tmin_stable_4kmM3_2018_all_bil/PRISM_tmin_stable_4kmM3_2018_bil.bil","/Users/averyharff/Downloads/CityLimits/CityLimits.shp")
-
-min19_salem <- cropped_tempCity("/Users/averyharff/Desktop/19MINPRISM_tmin_stable_4kmM3_2019_all_bil/PRISM_tmin_stable_4kmM3_2019_bil.bil","/Users/averyharff/Downloads/CityLimits/CityLimits.shp")
-
-max19_salem <- cropped_tempCity("/Users/averyharff/Desktop/19MINPRISM_tmin_stable_4kmM3_2019_all_bil/PRISM_tmin_stable_4kmM3_2019_bil.bil","/Users/averyharff/Downloads/CityLimits/CityLimits.shp")
-
-min18_medford <- cropped_tempCity("/Users/averyharff/Desktop/18TEMPMINPRISM_tmin_stable_4kmM3_2018_all_bil/PRISM_tmin_stable_4kmM3_2018_bil.bil", "/Users/averyharff/Downloads/medfordCity_Limits (1)/City_Limits.shp")
-
-max18_medford <- cropped_tempCity("/Users/averyharff/Desktop/18TEMPMINPRISM_tmin_stable_4kmM3_2018_all_bil/PRISM_tmin_stable_4kmM3_2018_bil.bil", "/Users/averyharff/Downloads/medfordCity_Limits (1)/City_Limits.shp")
-
-min19_medford <- cropped_tempCity("/Users/averyharff/Desktop/19MINPRISM_tmin_stable_4kmM3_2019_all_bil/PRISM_tmin_stable_4kmM3_2019_bil.bil","/Users/averyharff/Downloads/medfordCity_Limits (1)/City_Limits.shp")
-
-max19_medford <- cropped_tempCity("/Users/averyharff/Desktop/19MINPRISM_tmin_stable_4kmM3_2019_all_bil/PRISM_tmin_stable_4kmM3_2019_bil.bil","/Users/averyharff/Downloads/medfordCity_Limits (1)/City_Limits.shp")
 ```
 
 turn all cities into one list, make a four loop for each element of list use function created uptop. it will extract values from eugene and salem. return(give me back a table with max and min temp of each city) one for 18 one for 19. use city as uniting code for the table 
