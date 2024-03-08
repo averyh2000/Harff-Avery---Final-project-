@@ -63,24 +63,6 @@ OBA$`Abbreviated Location` <- sub(",$","", OBA$`Abbreviated Location`)
 ```
 
 ```{r}
-#making dataframe using filter 
-
-years <- c("2018", "2019")
-cities <- c("Eugene", "Portland", "Salem", "Medford", "Bend")
-month <- c("April", "May", "June", "July", "August", "September")
-OBA18_19 <- OBA %>% 
-  filter(Year %in% years) %>%
-  filter(`Abbreviated Location` %in% cities) %>% ## %in% telling filter to only use what is in the list 
-  filter(MonthJul %in% month)
-
-OBA18_19 <- OBA18_19[c("Dec. Long.", "Dec. Lat.","Abbreviated Location", "MonthJul", "Year 1", "Associated plant", "Species")]
-
-bee_plant_count <- OBA18_19 %>%  count(Species, `Associated plant`)
-
-```
-
-
-```{r}
 #dont have to load until plot 
 minTemp18 <- rast("/Users/averyharff/Desktop/18TEMPMINPRISM_tmin_stable_4kmM3_2018_all_bil/PRISM_tmin_stable_4kmM3_2018_bil.bil")
 
@@ -103,39 +85,87 @@ cropped_tempCity <- function(rasterfilename_min, rasterfilename_max,  cityfilena
 }
 
 #loading in data for min and max temperatures of portland. 
-temp2018_eugene <- cropped_tempCity(minTemp18, maxtemp18, eugene_vect)
+eugene18 <- cropped_tempCity(minTemp18, maxtemp18, eugene_vect)
 
-temp2019_eugene <- cropped_tempCity(mintemp19, maxtemp19, eugene_vect)
+eugene19 <- cropped_tempCity(mintemp19, maxtemp19, eugene_vect)
 
-temp2018_portland <- cropped_tempCity(minTemp18, maxtemp18, portland_vect)
+portland18 <- cropped_tempCity(minTemp18, maxtemp18, portland_vect)
 
-temp2019_portland <- cropped_tempCity(mintemp19, maxtemp19, portland_vect)
+portland19 <- cropped_tempCity(mintemp19, maxtemp19, portland_vect)
 
-temp2018_salem <- cropped_tempCity(minTemp18, maxtemp18, salem_vect)
+salem18 <- cropped_tempCity(minTemp18, maxtemp18, salem_vect)
 
-temp2019_salem <- cropped_tempCity(mintemp19, maxtemp19, salem_vect)
+salem19 <- cropped_tempCity(mintemp19, maxtemp19, salem_vect)
 
-temp2018_bend <- cropped_tempCity(minTemp18, maxtemp18, bend_vect)
+bend18 <- cropped_tempCity(minTemp18, maxtemp18, bend_vect)
 
-temp2019_bend <- cropped_tempCity(mintemp19, maxtemp19, bend_vect)
+bend19 <- cropped_tempCity(mintemp19, maxtemp19, bend_vect)
 
-temp2018_medford <- cropped_tempCity(minTemp18, maxtemp18, medford_vect)
+medford18 <- cropped_tempCity(minTemp18, maxtemp18, medford_vect)
 
-temp2019_medford <- cropped_tempCity(mintemp19, maxtemp19, medford_vect)
+medford19 <- cropped_tempCity(mintemp19, maxtemp19, medford_vect)
 
 ```
 
 turn all cities into one list, make a four loop for each element of list use function created uptop. it will extract values from eugene and salem. return(give me back a table with max and min temp of each city) one for 18 one for 19. use city as uniting code for the table 
 ```{r}
-#make list 
+#merge shape files for each city to one df have a column called year. create column for all files. create a function 
+#changing portlands CRS to match the rest of the cities 
+
+
+portland <- st_transform(portland, crs = st_crs(eugene))
+
+# Define the function
+convert_to_dataframe <- function(x) {
+  
+  combined_vector <- unlist(x)
+  # Find the minimum and maximum values in the combined vector
+  minTemp <- min(combined_vector)
+  maxTemp <- max(combined_vector)
+  
+  # Create a data frame with up to three columns
+  df <- data.frame(minTemp, maxTemp)
+  colnames(df) <- c("MinTemp", "MaxTemp")
+  
+  
+  return(df)
+}
+#Df of min and max temp of the city
+Bend18DF <- convert_to_dataframe(bend18)
+Bend19DF <- convert_to_dataframe(bend19)
+eugene18DF <- convert_to_dataframe(eugene18)
+eugene19DF <- convert_to_dataframe(eugene19)
+salem18DF <- convert_to_dataframe(salem18)
+salem19DF <- convert_to_dataframe(salem19)
+medford18DF <- convert_to_dataframe(medford18)
+medford19DF <- convert_to_dataframe(medford19)
+portland18DF <- convert_to_dataframe(portland18)
+portland19DF <- convert_to_dataframe(portland19)
+
+#merge all together
+merged <- merge(Bend18DF, Bend19DF, by = c('MinTemp', 'MaxTemp'))
+
+cityDF <- rbind(Bend18DF, Bend19DF, eugene18DF, eugene19DF, salem18DF, salem19DF, medford18DF, medford19DF, portland18DF, portland19DF)
+
+City <- c("Bend2018", "Bend2019", "Eugene2018", "Eugene2019", "Salem2018", "Salem2019", "Medford2018", "Medford2019", "Portland2018", "Portland2019")
+
+cityDF <- cbind(City, cityDF)
+
 ```
 
 ```{r}
- 
-```
 
-```{r}
+years <- c("2018", "2019")
+cities <- c("Eugene", "Portland", "Salem", "Medford", "Bend")
+#month <- c("April", "May", "June", "July", "August", "September")
+OBA18_19 <- OBA %>% 
+  filter(Year %in% years) %>%
+  filter(`Abbreviated Location` %in% cities) #%in% telling filter to only use what is in the list 
+  #filter(MonthJul %in% month)
 
+OBA18_19 <- OBA18_19[c("Dec. Long.", "Dec. Lat.","Abbreviated Location", "MonthJul", "Year 1", "Associated plant", "Species")]
+
+bee_plant_count <- OBA18_19 %>%  count(Species, `Associated plant`)
 ```
 
 ```{r}
