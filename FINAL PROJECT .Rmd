@@ -147,28 +147,42 @@ merged <- merge(Bend18DF, Bend19DF, by = c('MinTemp', 'MaxTemp'))
 
 cityDF <- rbind(Bend18DF, Bend19DF, eugene18DF, eugene19DF, salem18DF, salem19DF, medford18DF, medford19DF, portland18DF, portland19DF)
 
-City <- c("Bend2018", "Bend2019", "Eugene2018", "Eugene2019", "Salem2018", "Salem2019", "Medford2018", "Medford2019", "Portland2018", "Portland2019")
+City <- c("Bend", "Bend", "Eugene", "Eugene", "Salem", "Salem", "Medford", "Medford", "Portland", "Portland")
+Year <- c("2018", "2019", "2018", "2019", "2018", "2019", "2018", "2019", "2018", "2019")
 
-cityDF <- cbind(City, cityDF)
+rm(cityDF)
 
+cityDF <- cbind(City, Year, cityDF)
+cityDF$city_year <- paste(cityDF$City, cityDF$Year, sep = "_")
+#made table with city max and min temps 
 ```
 
 ```{r}
-
+# big table 
 years <- c("2018", "2019")
 cities <- c("Eugene", "Portland", "Salem", "Medford", "Bend")
 #month <- c("April", "May", "June", "July", "August", "September")
 OBA18_19 <- OBA %>% 
   filter(Year %in% years) %>%
   filter(`Abbreviated Location` %in% cities) #%in% telling filter to only use what is in the list 
+OBA18_19$city_year <- paste(OBA18_19$`Abbreviated Location`, OBA18_19$`Year 1`, sep = "_")
   #filter(MonthJul %in% month)
 
 OBA18_19 <- OBA18_19[c("Dec. Long.", "Dec. Lat.","Abbreviated Location", "MonthJul", "Year 1", "Associated plant", "Species")]
+
+complete_data<- merge(OBA18_19, cityDF, by = "city_year")
 
 bee_plant_count <- OBA18_19 %>%  count(Species, `Associated plant`)
 ```
 
 ```{r}
+#making rowsum for bees and plants 
+landing_count <- table(OBA18_19$Species, OBA18_19$`Associated plant`)
+
+landing_table <- as.data.frame.matrix(landing_count)
+
+sortedTable <- landing_table[order(rowSums(landing_count), decreasing = TRUE), ]
+
 
 ```
 
