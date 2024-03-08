@@ -189,18 +189,23 @@ sortedTable
 
 PLOTTING!! :)
 ```{r}
-#plotting all the finalized data 
+#plotting all the finalized data Minimum temp
 complete_data %>% 
   group_by(City, MonthJul, MinTemp, MaxTemp) %>% 
   summarize(Number_Bees = n_distinct(Species)) %>% 
-  ggplot() %>% 
-  geom_point(aes(x = MinTemp, y = Number_Bees, colour = "hotpink", size = 3, shape = ))
+  ggplot() + 
+  geom_point(aes(x = MinTemp, y = Number_Bees, colour = City, shape = MonthJul)) 
+
 ```
 
 
-plant - network
 ```{r}
-
+# Max temp 
+complete_data %>% 
+  group_by(City, MonthJul, MinTemp, MaxTemp) %>% 
+  summarize(Number_Bees = n_distinct(Species)) %>% 
+  ggplot() + 
+  geom_point(aes(x = MaxTemp, y = Number_Bees, colour = City, shape = MonthJul)) 
 ```
 
 
