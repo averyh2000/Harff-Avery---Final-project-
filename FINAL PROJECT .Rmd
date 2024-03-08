@@ -168,7 +168,7 @@ OBA18_19 <- OBA %>%
 OBA18_19$city_year <- paste(OBA18_19$`Abbreviated Location`, OBA18_19$`Year 1`, sep = "_")
   #filter(MonthJul %in% month)
 
-OBA18_19 <- OBA18_19[c("Dec. Long.", "Dec. Lat.","Abbreviated Location", "MonthJul", "Year 1", "Associated plant", "Species")]
+OBA18_19 <- OBA18_19[c("Dec. Long.", "Dec. Lat.", "MonthJul", "Associated plant", "Species")]
 
 complete_data<- merge(OBA18_19, cityDF, by = "city_year")
 
@@ -181,45 +181,23 @@ landing_count <- table(OBA18_19$Species, OBA18_19$`Associated plant`)
 
 landing_table <- as.data.frame.matrix(landing_count)
 
-sortedTable <- landing_table[order(rowSums(landing_count), decreasing = TRUE), ]
+#Able to sort the top 5 bees 
+sortedTable <- landing_table[order(rowSums(landing_count), decreasing = TRUE) [1:5],order(colSums(landing_count), decreasing = TRUE) [1:5]]
 
-
+sortedTable
 ```
 
-
+PLOTTING!! :)
 ```{r}
-
+#plotting all the finalized data 
+complete_data %>% 
+  group_by(City, MonthJul, MinTemp, MaxTemp) %>% 
+  summarize(Number_Bees = n_distinct(Species)) %>% 
+  ggplot() %>% 
+  geom_point(aes(x = MinTemp, y = Number_Bees, colour = "hotpink", size = 3, shape = ))
 ```
 
 
-graph the average precipitation levels in 2019 and 2018 in Oregon (scatterplot, continuouslty, color points by season)
-```{r}
-Oregon Prism website has data or 
-https://www.arcgis.com/home/item.html?id=dab2424ee1d9472ab126a771aa334990
-
-rain_levels <- read_xml()
-```
-
-sort bee plant and bee data into columns of rows of the post popular bees and plants. use a network for the plants and the city.  
-```{r}
-
-
-```
-
-make a table of the most popular cities (5) and plot the year month max temp, min temp, # bee species, # flower species
-```{r}
-
-```
-
-raster - oregon prism
-```{r}
-
-```
-oba - point data
-city -  spacial
-```{r}
-
-```
 plant - network
 ```{r}
 
