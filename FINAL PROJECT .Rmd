@@ -5,7 +5,8 @@ output: html_document
 date: "2024-02-27"
 ---
 
-
+Introduction: 
+Bees are a crucial role in the longevity of the ecosystem. Bees ensure continuous pollination of plants which in exchange help the atmosphere (Energy.org). In the state of Oregon, bees in urban areas effect the garden life by enriching insect wild life (Melathopoulos, 2020). Bees create environments for that allow for different insect pollinators to flourish (Melathopoulos, 2020). Bee season starts in spring and ends in early fall. With that being said, bees have a huge impact on the environment, in this study, examination of bees in 2018-2023 can help give better insight on which bees are the most popular in the 5 biggest cities in Oregon. Analysis on the top five bees and the top five associated flowers can allow us to visual the some of the bee populations in these cities over a six month span. Over these six months data of the minimum and maximum temperatures can help the observations of how the temperature affects the bee and flower species. 
 
  Question: 
 What are the top 5 most abundant bee species and most visited flower species in the top 5 biggest cities in Oregon (April-September)? 
@@ -206,8 +207,10 @@ complete_data %>%
 
 
 
+Resources:
+“National Pollinator Week: The Climate Threat to Bees.” Energy.Gov, www.energy.gov/energysaver/articles/national-pollinator-week-climate-threat-bees#:~:text=Bees%20play%20a%20crucial%20role,and%20releasing%20oxygen%20to%20it. Accessed 8 Mar. 2024. 
 
-
+Melathopoulos, Andony., et al.  “Enhancing Urban and Suburban Landscapes to Protect Pollinators.” OSU Extension Service, Oregon State University Extension Service, 26 Jan. 2024, extension.oregonstate.edu/catalog/pub/em-9289-enhancing-urban-suburban-landscapes-protect-pollinators. 
 
 
 
