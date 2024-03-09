@@ -4,8 +4,12 @@ author: Avery Harff
 output: html_document
 date: "2024-02-27"
 ---
- Question: The goal is to analyze how the Bombus Vosnesenkii interacts with different plants across Oregon in varying temperatures, climates (wet/ dry season), and altitude. 
- 
+
+
+
+ Question: 
+What are the top 5 most abundant bee species and most visited flower species in the top 5 biggest cities in Oregon (April-September)? 
+Does the Min or Max temperature for each month in each city affect the number of bee species or flower species observed?
 ```{r}
 library(tidyverse)
 library(bipartite)
@@ -18,18 +22,14 @@ library(readxl)
 library(lubridate)
 ```
 
-What are the tip 5 most abundant bee species and most visited flower species in the top 5 biggest cities in Oregon? April-September 
-
-Does the Min or max temperature for each month in each city affect the number of bee species or flower species observed?
 
 Top 5 cities in Oregon
 1 - Portland 
 2 - Eugene
 3 - Salem
-4 - medford
-5 - bend
+4 - Medford
+5 - Bend
 
-ouline of eugene
 ```{r}
 #shapefiles of the boundries of the five major cities
 
@@ -63,7 +63,7 @@ OBA$`Abbreviated Location` <- sub(",$","", OBA$`Abbreviated Location`)
 ```
 
 ```{r}
-#dont have to load until plot 
+#loading in the Min and Max temperatures in Oregon in years 2018 and 2019
 minTemp18 <- rast("/Users/averyharff/Desktop/18TEMPMINPRISM_tmin_stable_4kmM3_2018_all_bil/PRISM_tmin_stable_4kmM3_2018_bil.bil")
 
 maxtemp18 <- rast("/Users/averyharff/Desktop/18MaxPPRISM_tmax_stable_4kmM3_2018_all_bil/PRISM_tmax_stable_4kmM3_2018_bil.bil")
@@ -84,7 +84,7 @@ cropped_tempCity <- function(rasterfilename_min, rasterfilename_max,  cityfilena
                     return(c(min=out_min[,2], max=out_max[,2]))
 }
 
-#loading in data for min and max temperatures of portland. 
+#loading in data for min and max temperatures of each city. 
 eugene18 <- cropped_tempCity(minTemp18, maxtemp18, eugene_vect)
 
 eugene19 <- cropped_tempCity(mintemp19, maxtemp19, eugene_vect)
@@ -107,29 +107,25 @@ medford19 <- cropped_tempCity(mintemp19, maxtemp19, medford_vect)
 
 ```
 
-turn all cities into one list, make a four loop for each element of list use function created uptop. it will extract values from eugene and salem. return(give me back a table with max and min temp of each city) one for 18 one for 19. use city as uniting code for the table 
+creating a function to made the numerical lists a dataframe and adding columns with MinTemp, MaxTemp and City. Merging them all together into one dataframe. 
 ```{r}
 #merge shape files for each city to one df have a column called year. create column for all files. create a function 
 #changing portlands CRS to match the rest of the cities 
 
-
 portland <- st_transform(portland, crs = st_crs(eugene))
 
-# Define the function
+# creating a function to made the numerical lists a dataframe and adding columns with MinTemp, MaxTemp and City 
 convert_to_dataframe <- function(x) {
   
   combined_vector <- unlist(x)
-  # Find the minimum and maximum values in the combined vector
   minTemp <- min(combined_vector)
   maxTemp <- max(combined_vector)
-  
-  # Create a data frame with up to three columns
   df <- data.frame(minTemp, maxTemp)
   colnames(df) <- c("MinTemp", "MaxTemp")
   
-  
   return(df)
 }
+
 #Df of min and max temp of the city
 Bend18DF <- convert_to_dataframe(bend18)
 Bend19DF <- convert_to_dataframe(bend19)
@@ -156,7 +152,7 @@ cityDF <- cbind(City, Year, cityDF)
 cityDF$city_year <- paste(cityDF$City, cityDF$Year, sep = "_")
 #made table with city max and min temps 
 ```
-
+Created a big table from 2018-2023 OBA data containing year, month, city, Species, and Assoicated Plants. Created a list of the years and cities and filtered them into the table. Once the big table was made I merged toghethr the temperature table and the OBA18&19 table by city year and added the min and max temperatures to the table. 
 ```{r}
 # big table 
 years <- c("2018", "2019")
@@ -174,7 +170,7 @@ complete_data<- merge(OBA18_19, cityDF, by = "city_year")
 
 bee_plant_count <- OBA18_19 %>%  count(Species, `Associated plant`)
 ```
-
+From the OBA18_19 data I made a table of just the bees and associated plants. Loaded them as a dataframe so R can count the amount of time the Bee landed on a certain plant. Then I sorted the table and put the bees in increasing order and made R sort through the top 5 Bees assoicated with its preferred plant, with the number of times the bee was spotted on the plant.  
 ```{r}
 #making rowsum for bees and plants 
 landing_count <- table(OBA18_19$Species, OBA18_19$`Associated plant`)
@@ -187,7 +183,7 @@ sortedTable <- landing_table[order(rowSums(landing_count), decreasing = TRUE) [1
 sortedTable
 ```
 
-PLOTTING!! :)
+took all my data and made a scatter plot of the Min and Max temperatures on the X axis and the number of Bees on the Y axis. The plot is organized as different colors indicating cities and the shapes indicating the months (April- September). 
 ```{r}
 #plotting all the finalized data Minimum temp
 complete_data %>% 
@@ -209,9 +205,6 @@ complete_data %>%
 ```
 
 
-```{r}
-
-```
 
 
 
